@@ -1,39 +1,21 @@
-//Componente REACT
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+import React from 'react';
+import { useRouter } from 'next/router';
+import appConfig from '../config.json';
+import { createClient } from '@supabase/supabase-js'
 
 
-import appConfig from '../config.json'
+// Como fazer AJAX: https://medium.com/@omariosouto/entendendo-como-fazer-ajax-com-a-fetchapi-977ff20da3c6
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0Mzg5NjY1NCwiZXhwIjoxOTU5NDcyNjU0fQ.eFk2icWPPMGeawme4rGtxKv8OeL_RDmnTZhuO8Qf1QU';
+const SUPABASE_URL = 'https://nohbvepcmhdykwakisrb.supabase.co';
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          list-style: none;
-        }
-        body {
-          font-family: 'Open Sans', sans-serif;
-        }
-        /* App fit Height */ 
-        html, body, #__next {
-          min-height: 100vh;
-          display: flex;
-          flex: 1;
-        }
-        #__next {
-          flex: 1;
-        }
-        #__next > * {
-          flex: 1;
-        }
-        /* ./App fit Height */ 
-      `}</style>
-  );
-}
+//minha chave
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0Mzg5NjY1NCwiZXhwIjoxOTU5NDcyNjU0fQ.eFk2icWPPMGeawme4rGtxKv8OeL_RDmnTZhuO8Qf1QU
+//minha url
 
+//https://nohbvepcmhdykwakisrb.supabase.co
 function Titulo(props) {
   const Tag = props.tag || 'h1';
   return (
@@ -49,27 +31,35 @@ function Titulo(props) {
     </>
   );
 }
-/*
-function HomePage() {
-  //JSX
-  return (
-    <div>
-      <GlobalStyle />
-      <Titulo tag="h1" name="Bem vindo ao app em REACT "  ></Titulo>
-      <h2>Discord - Alura Matrix!</h2>
 
+// Componente React
+// function HomePage() {
+//     // JSX
+//     return (
+//         <div>
+//             <GlobalStyle />
+//             <Titulo tag="h2">Boas vindas de volta!</Titulo>
+//             <h2>Discord - Alura Matrix</h2>
+//         </div>
+//     )
+// }
+// export default HomePage
 
-    </div>
-  )
-}*/
-
-//export default HomePage
 export default function PaginaInicial() {
-  const username = 'vagnercborges';
+  // const username = 'omariosouto';
+  const [username, setUsername] = React.useState('vagnercborges');
+  const roteamento = useRouter();
+
+
+  const dadosDoSupabase = supabaseClient
+	.from('mensagens')
+	.select('*')
+	.then((dados) => { 
+		console.log('Dados da consulta:');
+	});
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -96,6 +86,13 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={function (infosDoEvento) {
+              infosDoEvento.preventDefault();
+              console.log('Alguém submeteu o form');
+              
+              roteamento.push(`/chat?username=${username}`);
+              // window.location.href = '/chat';
+            }}
             styleSheet={{
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               width: { xs: '100%', sm: '50%' }, textAlign: 'center', marginBottom: '32px',
@@ -106,7 +103,28 @@ export default function PaginaInicial() {
               {appConfig.name}
             </Text>
 
+            {/* <input
+                            type="text"
+                            value={username}
+                            onChange={function (event) {
+                                console.log('usuario digitou', event.target.value);
+                                // Onde ta o valor?
+                                const valor = event.target.value;
+                                // Trocar o valor da variavel
+                                // através do React e avise quem precisa
+                                setUsername(valor);
+                            }}
+                        /> */}
             <TextField
+              value={username}
+              onChange={function (event) {
+                console.log('usuario digitou', event.target.value);
+                // Onde ta o valor?
+                const valor = event.target.value;
+                // Trocar o valor da variavel
+                // através do React e avise quem precisa
+                setUsername(valor);
+              }}
               fullWidth
               textFieldColors={{
                 neutral: {
